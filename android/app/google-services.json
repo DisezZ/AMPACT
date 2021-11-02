@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "747009751935",
+    "project_id": "ampact-c1d3c",
+    "storage_bucket": "ampact-c1d3c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747009751935:android:766503f113adeebcdd784a",
+        "android_client_info": {
+          "package_name": "com.nulltech.ampact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "747009751935-1b47tq8fm9fsrfcairet6t4gmjgss769.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACAelhoRVKqqg_A-oxuu_11GMDMEbAGR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "747009751935-1b47tq8fm9fsrfcairet6t4gmjgss769.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
