@@ -10,10 +10,9 @@ class HomeController {
 
   void onSignOutPressed(BuildContext context) async {
     dynamic result = await _auth.signOut();
-    if (result != null) {
+    if (result == null) {
       print('sign out successfully');
       print(result);
-      Navigator.pushNamed(context, SignInView.routeName);
     } else {
       print('sign out failed');
     }

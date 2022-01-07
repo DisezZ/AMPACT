@@ -1,5 +1,9 @@
+import 'package:ampact/src/authentication/models/user_info.dart';
+import 'package:ampact/src/core/navigator/navigator_view.dart';
 import 'package:ampact/src/navigation/home/home_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../services/auth.dart';
 
@@ -13,19 +17,42 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final HomeController controller = HomeController();
-  
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<CustomUser?>(context);
+    final userInfo = Provider.of<QuerySnapshot?>(context);
+    int currentIndex = 0;
+    print(user!.uid);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
           ElevatedButton(
-            onPressed: () => controller.onSignOutPressed(context), 
+            onPressed: () => controller.onSignOutPressed(context),
             child: const Text('Sign Out'),
           ),
         ],
+      ),
+      body: Center(
+        child: Text('Hello'),
+      ),
+      bottomNavigationBar: APCustomBNB(
+        items: const [
+          APCustomBNBItem(iconData: Icons.home, text: 'Home'),
+          APCustomBNBItem(iconData: Icons.assignment_ind, text: 'Care'),
+          APCustomBNBItem(iconData: Icons.notifications, text: 'Notice'),
+          APCustomBNBItem(iconData: Icons.account_circle, text: 'Profile'),
+          APCustomBNBItem(iconData: Icons.add, text: 'Add'),
+        ],
+        backgroundColor: Colors.blueAccent,
+        color: Colors.white,
+        selectedColor: Colors.deepOrangeAccent,
+        floatButtonColor: Colors.white,
+        floatButtonBG: Colors.deepOrangeAccent,
+        onTabSelected: (index) => currentIndex = index,
       ),
     );
   }

@@ -1,8 +1,12 @@
+import 'package:ampact/src/authentication/authentication_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:ampact/src/authentication/authentication_wrapper.dart';
 import 'package:ampact/src/authentication/sign_in/sign_in_view.dart';
 import 'package:ampact/src/navigation/home/home_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:ampact/src/services/auth.dart';
+import 'package:provider/provider.dart';
 
 class RegisterController {
 
@@ -42,7 +46,7 @@ class RegisterController {
     }
   }
 
-  void onBackToSignInPressed(BuildContext context) => Navigator.pushNamed(context, SignInView.routeName);
+  void onBackToSignInPressed(BuildContext context) => Provider.of<AuthenticationProvider>(context, listen: false).changeToSignIn();
 
   void onRegisterPressed(BuildContext context) async {
     final bool isFormValid = formKey.currentState!.validate();
@@ -50,9 +54,9 @@ class RegisterController {
       formKey.currentState!.save();
       dynamic result = await _auth.createUserWithEmailAndPassword(_email!, _password!);
       if (result != null) {
+        Provider.of<AuthenticationProvider>(context, listen: false).changeToSignIn();
         print('register successfully');
         print(result);
-        Navigator.pushNamed(context, HomeView.routeName);
       } else {
         print('register failed');
       }

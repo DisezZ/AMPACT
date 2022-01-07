@@ -1,3 +1,5 @@
+import 'package:ampact/src/authentication/authentication_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:ampact/src/authentication/register/register_view.dart';
 import 'package:flutter/material.dart';
 

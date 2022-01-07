@@ -1,3 +1,5 @@
+import 'package:ampact/src/authentication/authentication_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:ampact/src/authentication/register/register_view.dart';
 import 'package:ampact/src/navigation/home/home_view.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +47,7 @@ class SignInController {
 
   void onForgotPasswordPressed(BuildContext context) => Navigator.pushNamed(context, '/');
 
-  void onRegisterNowPressed(BuildContext context) => Navigator.pushNamed(context, RegisterView.routeName);
+  void onRegisterNowPressed(BuildContext context) => Provider.of<AuthenticationProvider>(context, listen: false).changeToRegister();
 
   void onSignInPressed(BuildContext context) async {
     final bool isFormValid = formKey.currentState!.validate();
@@ -55,7 +57,6 @@ class SignInController {
       if (result != null) {
         print('sign in successfully');
         print(result);
-        Navigator.pushNamed(context, HomeView.routeName);
       } else {
         print('sign in failed');
       }

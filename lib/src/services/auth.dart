@@ -1,3 +1,4 @@
+import 'package:ampact/src/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ampact/src/authentication/models/user_info.dart';
 
@@ -48,6 +49,7 @@ class AuthService {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = credential.user;
+      await DatabaseService(uid: user?.uid).updateUserData(email);
       return  _customUserFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());
