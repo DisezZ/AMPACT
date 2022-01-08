@@ -1,6 +1,7 @@
 import 'package:ampact/src/authentication/authentication_provider.dart';
 import 'package:ampact/src/authentication/register/register_view.dart';
 import 'package:ampact/src/authentication/sign_in/sign_in_view.dart';
+import 'package:ampact/src/core/core_wrapper.dart';
 import 'package:ampact/src/navigation/home/home_view.dart';
 import 'package:ampact/src/services/database.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
       return StreamProvider.value(
         initialData: null,
         value: DatabaseService().userStream,
-        child: const HomeView(),
+        child: const CoreWrapper(),
       );
     }
   }

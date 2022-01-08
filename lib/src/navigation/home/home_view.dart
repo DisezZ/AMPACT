@@ -26,17 +26,19 @@ class _HomeViewState extends State<HomeView> {
     print(user!.uid);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
           ElevatedButton(
             onPressed: () => controller.onSignOutPressed(context),
             child: const Text('Sign Out'),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).primaryColor
+            ),
           ),
         ],
       ),
-      body: Center(
+      body: const Center(
         child: Text('Hello'),
       ),
       bottomNavigationBar: APCustomBNB(
@@ -47,11 +49,7 @@ class _HomeViewState extends State<HomeView> {
           APCustomBNBItem(iconData: Icons.account_circle, text: 'Profile'),
           APCustomBNBItem(iconData: Icons.add, text: 'Add'),
         ],
-        backgroundColor: Colors.blueAccent,
-        color: Colors.white,
-        selectedColor: Colors.deepOrangeAccent,
-        floatButtonColor: Colors.white,
-        floatButtonBG: Colors.deepOrangeAccent,
+        backgroundColor: Colors.white,
         onTabSelected: (index) => currentIndex = index,
       ),
     );

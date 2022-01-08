@@ -99,6 +99,27 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     validator: controller.validateConfirmPassword,
                   ),
+                  SizedBox(
+                    height: size.height * 0.02,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.grey,),
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String?>(
+                        value: controller.selectedRole,
+                        iconSize: 36,
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
+                        style: const TextStyle(color: Colors.black87),
+                        isExpanded: true,
+                        items: controller.roleList!.map(buildMenuItem).toList(),
+                        onChanged: (value) => setState(() => controller.selectedRole = value),
+                      ),
+                    ),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -141,6 +162,13 @@ class _RegisterViewState extends State<RegisterView> {
       ),
     );
   }
+  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
+    value: item,
+    child: Text(
+      'Role: ' + item,
+      style: const TextStyle(fontSize: 20),
+    ),
+  );
 }
 
 

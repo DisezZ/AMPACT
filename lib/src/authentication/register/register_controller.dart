@@ -17,6 +17,9 @@ class RegisterController {
   String? _confirmPassword = "";
   bool passwordVisibility = false;
   bool confirmPasswordVisibility = false;
+  final List<String>? roleList = ['caretaker', 'elderly/blinded'];
+  final List<String>? roles = ['giver', 'receiver'];
+  String? selectedRole = 'caretaker';
 
   void onEmailSaved(String? email) => _email = email;
   String? validateEmail(String? email) {

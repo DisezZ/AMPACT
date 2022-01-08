@@ -1,3 +1,4 @@
+import 'package:ampact/constants.dart';
 import 'package:flutter/material.dart';
 
 class APCustomBNBItem {
@@ -14,12 +15,8 @@ class APCustomBNB extends StatefulWidget {
     this.height = 80,
     this.iconSize = 35,
     this.backgroundColor,
-    this.color,
-    this.selectedColor,
-    this.floatButtonColor,
-    this.floatButtonBG,
-    this.notchedShape,
     this.onTabSelected,
+    this.onButtonPressed,
   }) :  assert(items.length == 5),
         super(key: key);
 
@@ -27,12 +24,8 @@ class APCustomBNB extends StatefulWidget {
   final double height;
   final double iconSize;
   final Color? backgroundColor;
-  final Color? selectedColor;
-  final Color? color;
-  final Color? floatButtonColor;
-  final Color? floatButtonBG;
-  final NotchedShape? notchedShape;
   final ValueChanged<int>? onTabSelected;
+  final VoidCallback? onButtonPressed;
 
   @override
   _APCustomBNBState createState() => _APCustomBNBState();
@@ -60,31 +53,43 @@ class _APCustomBNBState extends State<APCustomBNB> {
     });
     Widget floatButton = _buildFloatTabItem(item: widget.items[4], onPressed: null);
 
-    return Stack(
-      children: [
-        CustomPaint(
-          size: Size(size.width, widget.height),
-          painter: BNBCustomPainter(color: widget.backgroundColor!),
-        ),
-        Center(
-            heightFactor: 0.6,
-            child: floatButton
-        ),
-        Container(
-          width: size.width,
-          height: 80,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              items[0],
-              items[1],
-              Container(width: size.width * 0.2),
-              items[2],
-              items[3],
-            ],
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(0, -10),
+            blurRadius: 35,
+            color: kPrimaryColor.withOpacity(0.38),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Stack(
+        children: [
+          CustomPaint(
+            size: Size(size.width, widget.height),
+            painter: BNBCustomPainter(color: widget.backgroundColor!),
+          ),
+          Center(
+              heightFactor: 0.6,
+              child: floatButton
+          ),
+          Container(
+            width: size.width,
+            height: 80,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                items[0],
+                items[1],
+                Container(width: size.width * 0.2),
+                items[2],
+                items[3],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -93,10 +98,12 @@ class _APCustomBNBState extends State<APCustomBNB> {
     required int index,
     ValueChanged<int>? onPressed
   }) {
-    Color? color = _selectedIndex == index? widget.selectedColor : widget.color;
+    Color? iconColor = _selectedIndex == index? kSecondaryColor : kPrimaryColor;
     return IconButton(
       onPressed: () => onPressed!(index),
-      icon: Icon(item!.iconData, size: widget.iconSize, color: color,),
+      icon: Icon(item!.iconData, size: widget.iconSize, color: iconColor,),
+      splashColor: Colors.transparent,
+      focusColor: Colors.transparent,
     );
   }
 
@@ -105,16 +112,16 @@ class _APCustomBNBState extends State<APCustomBNB> {
     ValueChanged<void>? onPressed
   }) {
     return FloatingActionButton(
-      onPressed: () {},
-      backgroundColor: widget.floatButtonBG,
-      child: Icon(item!.iconData, size: widget.iconSize, color: widget.floatButtonColor,),
+      onPressed: widget.onButtonPressed,
+      backgroundColor: kPrimaryColor,
+      child: Icon(item!.iconData, size: widget.iconSize, ),
       elevation: 0.1,
     );
   }
 }
 
 class BNBCustomPainter extends CustomPainter {
-  const BNBCustomPainter({this.color = Colors.blueAccent});
+  const BNBCustomPainter({this.color = Colors.red});
   final Color color;
 
   @override
@@ -123,13 +130,12 @@ class BNBCustomPainter extends CustomPainter {
     Path path = Path()..moveTo(0, 20);
     path.quadraticBezierTo(size.width * 0.20, 0, size.width * 0.35, 0);
     path.quadraticBezierTo(size.width * 0.40, 0, size.width * 0.40, 20);
-    path.arcToPoint(Offset(size.width * 0.60, 20), radius: Radius.circular(10.0), clockwise: false);
+    path.arcToPoint(Offset(size.width * 0.60, 20), radius: const Radius.circular(10.0), clockwise: false);
     path.quadraticBezierTo(size.width * 0.60, 0, size.width * 0.65, 0);
     path.quadraticBezierTo(size.width * 0.80, 0, size.width, 20);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
-    canvas.drawShadow(path, Colors.black, 5, true);
     canvas.drawPath(path, paint);
   }
 

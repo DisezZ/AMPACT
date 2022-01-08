@@ -21,7 +21,6 @@ class _SignInViewState extends State<SignInView> {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
         child: Center(
