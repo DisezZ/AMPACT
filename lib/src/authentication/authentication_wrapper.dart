@@ -33,11 +33,12 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         return const RegisterView();
       }
     } else {
-      return StreamProvider.value(
+      return /*StreamProvider.value(
         initialData: null,
         value: DatabaseService().userStream,
         child: const CoreWrapper(),
-      );
+      );*/
+      const CoreWrapper();
     }
   }
 }

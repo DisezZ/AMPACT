@@ -11,9 +11,15 @@ class DatabaseService {
   final  CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
 
   // update user data
-  Future updateUserData(String email) async {
+  Future updateUserData(String email, String role) async {
+    List<String> emptyList = [];
     return await usersCollection.doc(uid).set({
       'email': email,
+      'role': role,
+      'firstName': '',
+      'lastName':'',
+      'list': [],
+      'profileImage': 'https://ui-avatars.com/api/?background=387be7&color=F9F8FD&name=$email',
     });
   }
 

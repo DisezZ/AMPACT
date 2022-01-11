@@ -110,13 +110,16 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String?>(
-                        value: controller.selectedRole,
+                        value: controller.roleList![controller.selectedRole],
                         iconSize: 36,
                         icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
                         style: const TextStyle(color: Colors.black87),
                         isExpanded: true,
                         items: controller.roleList!.map(buildMenuItem).toList(),
-                        onChanged: (value) => setState(() => controller.selectedRole = value),
+                        onChanged: (value) => setState(() {
+                          value == controller.roleList![0]? controller.selectedRole = 0 : controller.selectedRole = 1;
+                          print(controller.roles![controller.selectedRole]);
+                        }),
                       ),
                     ),
                   ),

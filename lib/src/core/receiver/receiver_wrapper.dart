@@ -4,10 +4,17 @@ import 'package:ampact/src/core/receiver/device/receiver_device_view.dart';
 import 'package:ampact/src/core/receiver/home/receiver_home_view.dart';
 import 'package:ampact/src/core/receiver/list/receiver_list_view.dart';
 import 'package:ampact/src/core/receiver/receiver_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ReceiverWrapper extends StatefulWidget {
-  const ReceiverWrapper({Key? key}) : super(key: key);
+  const ReceiverWrapper({
+    Key? key,
+    this.snapshot,
+
+  }) : super(key: key);
+
+  final AsyncSnapshot<DocumentSnapshot>? snapshot;
 
   @override
   _ReceiverWrapperState createState() => _ReceiverWrapperState();
@@ -40,7 +47,10 @@ class _ReceiverWrapperState extends State<ReceiverWrapper> {
           ),
         ],
       ),
-      body: screenContent[currentIndex],
+      body: IndexedStack(
+        index: currentIndex,
+        children: screenContent,
+      ),
       bottomNavigationBar: APCustomBNB(
         items: const [
           APCustomBNBItem(iconData: Icons.home, text: 'Home'),

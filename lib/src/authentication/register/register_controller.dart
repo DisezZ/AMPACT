@@ -19,7 +19,7 @@ class RegisterController {
   bool confirmPasswordVisibility = false;
   final List<String>? roleList = ['caretaker', 'elderly/blinded'];
   final List<String>? roles = ['giver', 'receiver'];
-  String? selectedRole = 'caretaker';
+  int selectedRole = 0;
 
   void onEmailSaved(String? email) => _email = email;
   String? validateEmail(String? email) {
@@ -55,7 +55,7 @@ class RegisterController {
     final bool isFormValid = formKey.currentState!.validate();
     if (isFormValid) {
       formKey.currentState!.save();
-      dynamic result = await _auth.createUserWithEmailAndPassword(_email!, _password!);
+      dynamic result = await _auth.createUserWithEmailAndPassword(_email!, _password!, roles![selectedRole]);
       if (result != null) {
         Provider.of<AuthenticationProvider>(context, listen: false).changeToSignIn();
         print('register successfully');

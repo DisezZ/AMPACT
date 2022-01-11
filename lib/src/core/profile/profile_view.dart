@@ -1,3 +1,5 @@
+import 'package:ampact/constants.dart';
+import 'package:ampact/src/services/auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfileView extends StatefulWidget {
@@ -10,8 +12,18 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('Profile'),
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          TextButton(
+            onPressed: () => AuthService().signOut(),
+            child: const Text('Sign Out'),
+            style: TextButton.styleFrom(
+                primary: kTextColor
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

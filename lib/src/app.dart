@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:ampact/constants.dart';
 import 'package:ampact/src/authentication/authentication_provider.dart';
 import 'package:ampact/src/authentication/register/register_view.dart';
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
         return MultiProvider(
           providers: [
             StreamProvider(create: (_) => AuthService().userStream, initialData: null),
-            ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider())
+            ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider()),
           ],
           //initialData: null,
           //value: AuthService().userStream,
@@ -71,12 +73,26 @@ class MyApp extends StatelessWidget {
             // SettingsController to display the correct theme.
             theme: ThemeData(
               primaryColor: kPrimaryColor,
-              scaffoldBackgroundColor: kBackgroundColor,
+              backgroundColor: kBackgroundColor,
+              textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
               appBarTheme: const AppBarTheme(
                 backgroundColor: Color(0xFF387be7),
               ),
-              textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
               visualDensity: VisualDensity.adaptivePlatformDensity,
+
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  primary: kPrimaryColor,
+                  elevation: 5,
+                  minimumSize: Size(70,30),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
             darkTheme: ThemeData.dark(),
             themeMode: settingsController.themeMode,
@@ -111,6 +127,17 @@ class MyApp extends StatelessWidget {
         );
       },
     );
+  }
+
+  MaterialStateProperty<Color?> getColor(Color color, Color colorPressed) {
+    getColor (Set<MaterialState> states) {
+      if (states.contains(MaterialState.pressed)) {
+        return colorPressed;
+      } else {
+        return color;
+      }
+    }
+    return  MaterialStateProperty.resolveWith(getColor);
   }
 }
 
