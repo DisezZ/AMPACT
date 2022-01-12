@@ -1,5 +1,7 @@
 import 'package:ampact/constants.dart';
+import 'package:ampact/src/core/camera/camera_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -17,10 +19,12 @@ class _GiverHomeViewState extends State<GiverHomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final userInfo = Provider.of<AsyncSnapshot<DocumentSnapshot>>(context);
+    final userInfo = Provider.of<DocumentSnapshot?>(context);
     final size = MediaQuery.of(context).size;
-    final List<dynamic> list = userInfo.data!['list'];
-    for (var element in list) {print('care for $element');}
+    final List<dynamic> list = userInfo!['list'];
+    for (var element in list) {
+      print('care for $element');
+    }
     return Container(
       color: Theme.of(context).backgroundColor,
       child: Column(
@@ -29,8 +33,12 @@ class _GiverHomeViewState extends State<GiverHomeView> {
           _buildBody(userInfo, size),
           ElevatedButton(
             onPressed: () => _speak(),
-            child: Text('Pressed'),
-          )
+            child: Text('TTS Pressed'),
+          ),
+          ElevatedButton(
+            onPressed: () => _camera(),
+            child: Text('Camera Pressed'),
+          ),
         ],
       ),
     );
@@ -43,7 +51,18 @@ class _GiverHomeViewState extends State<GiverHomeView> {
     await flutterTTS.speak('Genius');
   }
 
-  Widget _buildTitle(AsyncSnapshot<DocumentSnapshot> userInfo, Size size) {
+  void _camera() async {
+    await availableCameras().then((value) => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CameraView(
+              cameras: value,
+            ),
+          ),
+        ));
+  }
+
+  Widget _buildTitle(DocumentSnapshot? userInfo, Size size) {
     return Container(
       //color: Colors.black,
       margin: const EdgeInsets.only(bottom: kDefaultPadding * 1.5),
@@ -66,42 +85,43 @@ class _GiverHomeViewState extends State<GiverHomeView> {
             ),
           ),
           SafeArea(
-            child: Container(
-              padding: const EdgeInsets.only(
-                  left: kDefaultPadding,
-                  top: kDefaultPadding * 1.5,
-                  right: kDefaultPadding
-              ),
-              width: size.width,
-              child: Column(
-                children: [
-                  Container(
-                    width: size.width * 0.4,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Theme.of(context).backgroundColor.withOpacity(0.25),
-                            ),
-                            height: size.height * 0.01,
+              child: Container(
+            padding: const EdgeInsets.only(
+                left: kDefaultPadding,
+                top: kDefaultPadding * 1.5,
+                right: kDefaultPadding),
+            width: size.width,
+            child: Column(
+              children: [
+                Container(
+                  width: size.width * 0.4,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Theme.of(context)
+                                .backgroundColor
+                                .withOpacity(0.25),
                           ),
+                          height: size.height * 0.01,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2),
-                          child: Image.asset('assets/images/logo_name_white.png'),
-                        )
-                      ],
-                    ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: kDefaultPadding / 2),
+                        child: Image.asset('assets/images/logo_name_white.png'),
+                      )
+                    ],
                   ),
-                ],
-              ),
-            )
-          ),
+                ),
+              ],
+            ),
+          )),
           Positioned(
             bottom: 0,
             left: 0,
@@ -122,15 +142,14 @@ class _GiverHomeViewState extends State<GiverHomeView> {
               ),
               child: _buildTitleCard(userInfo, size),
             ),
-
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildTitleCard(AsyncSnapshot<DocumentSnapshot> userInfo, Size size) {
-    final List<dynamic> list = userInfo.data!['list'];
+
+  Widget _buildTitleCard(DocumentSnapshot? userInfo, Size size) {
+    final List<dynamic> list = userInfo!['list'];
     return Container(
       padding: const EdgeInsets.all(kDefaultPadding),
       child: Column(
@@ -141,7 +160,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
               Flexible(
                 flex: 2,
                 child: CircleAvatar(
-                  backgroundImage: NetworkImage(userInfo.data!['profileImage']),
+                  backgroundImage: NetworkImage(userInfo['profileImage']),
                   radius: 30,
                 ),
               ),
@@ -154,7 +173,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
                       child: Container(
                         padding: const EdgeInsets.only(left: kDefaultPadding),
                         child: AutoSizeText(
-                          '${userInfo.data!['firstName']}',
+                          '${userInfo['firstName']}',
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -167,9 +186,10 @@ class _GiverHomeViewState extends State<GiverHomeView> {
                     Flexible(
                       flex: 1,
                       child: Container(
-                        padding: const EdgeInsets.only(left: kDefaultPadding / 2),
+                        padding:
+                            const EdgeInsets.only(left: kDefaultPadding / 2),
                         child: AutoSizeText(
-                          '${userInfo.data!['lastName']}',
+                          '${userInfo['lastName']}',
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -210,30 +230,35 @@ class _GiverHomeViewState extends State<GiverHomeView> {
       children: [
         Text(
           '$topic:',
-          style: const TextStyle(
-              fontWeight: FontWeight.bold
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
           value,
-          style: const TextStyle(
-              fontWeight: FontWeight.bold
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
     );
   }
-  
-  Widget _buildBody(AsyncSnapshot<DocumentSnapshot> userInfo, Size size) {
-    final List<dynamic> list = Provider.of<AsyncSnapshot<DocumentSnapshot>>(context).data!['list'];
+
+  Widget _buildBody(DocumentSnapshot userInfo, Size size) {
     return Column(
       children: [
         Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildBodyCard(userInfo, size, 'Elderly/Blinded', '${list.length}', 'Total',),
-              _buildBodyCard(userInfo, size, 'Notification', '0', 'Total',),
+              _buildBodyCard(
+                size,
+                'Elderly/Blinded',
+                '${userInfo['list'].length}',
+                'Total',
+              ),
+              _buildBodyCard(
+                size,
+                'Notification',
+                '0',
+                'Total',
+              ),
             ],
           ),
         )
@@ -241,7 +266,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
     );
   }
 
-  Widget _buildBodyCard(AsyncSnapshot<DocumentSnapshot> userInfo, Size size, String title, String value1, String value2) {
+  Widget _buildBodyCard(Size size, String title, String value1, String value2) {
     return Column(
       children: [
         Container(
@@ -286,7 +311,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
               BoxShadow(
                 offset: const Offset(0, 10),
                 blurRadius: 5,
-                color:Theme.of(context).primaryColor.withOpacity(0.23),
+                color: Theme.of(context).primaryColor.withOpacity(0.23),
               ),
             ],
           ),
@@ -304,9 +329,9 @@ class _GiverHomeViewState extends State<GiverHomeView> {
               Text(
                 value2,
                 style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
               ),
             ],
           ),

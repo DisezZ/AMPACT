@@ -9,6 +9,13 @@ import 'package:provider/provider.dart';
 class GiverController {
   final AuthService _auth = AuthService();
 
+  final List<Widget> tabsContent = [
+    const GiverHomeView(),
+    const GiverListView(),
+    const GiverNotificationView(),
+    const ProfileView(),
+  ];
+
   final iconsContent = [
     const Icon(Icons.home),
     const Icon(Icons.assignment_ind),

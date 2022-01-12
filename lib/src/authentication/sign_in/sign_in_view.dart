@@ -1,14 +1,14 @@
-import 'package:ampact/constants.dart';
-import 'package:ampact/src/authentication/authentication_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:ampact/src/authentication/register/register_view.dart';
 import 'package:flutter/material.dart';
 
 import 'sign_in_controller.dart';
 
 class SignInView extends StatefulWidget {
-  const SignInView({Key? key}) : super(key: key);
-  static const routeName = '/sign in';
+  final Function() onRegisterClicked;
+
+  const SignInView({
+    Key? key,
+    required this.onRegisterClicked,
+  }) : super(key: key);
 
   @override
   _SignInViewState createState() => _SignInViewState();
@@ -16,6 +16,14 @@ class SignInView extends StatefulWidget {
 
 class _SignInViewState extends State<SignInView> {
   final SignInController controller = SignInController();
+
+  @override
+  void dispose() {
+    controller.email.dispose();
+    controller.password.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +40,7 @@ class _SignInViewState extends State<SignInView> {
               children: [
                 Image.asset('assets/images/logo_ampact.png'),
                 TextFormField(
-                  onSaved: controller.onEmailSaved,
+                  controller: controller.email,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     hintText: 'Type your email',
@@ -41,13 +49,14 @@ class _SignInViewState extends State<SignInView> {
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: controller.validateEmail,
                 ),
                 SizedBox(
                   height: size.height * 0.02,
                 ),
                 TextFormField(
-                  onSaved: controller.onPasswordSaved,
+                  controller: controller.password,
                   obscureText: !controller.passwordVisibility,
                   decoration: InputDecoration(
                     labelText: 'Password',
@@ -68,20 +77,22 @@ class _SignInViewState extends State<SignInView> {
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: controller.validatePassword,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: () => controller.onForgotPasswordPressed(context),
+                      onPressed: () =>
+                          controller.onForgotPasswordPressed(context),
                       child: const Text(
                         'Forgot Password?',
                         style: TextStyle(color: Colors.blue),
                       ),
                     ),
                     TextButton(
-                      onPressed: () => controller.onRegisterNowPressed(context),
+                      onPressed: widget.onRegisterClicked,
                       child: const Text(
                         'Register Now',
                         style: TextStyle(color: Colors.blue),
@@ -95,7 +106,10 @@ class _SignInViewState extends State<SignInView> {
                     SizedBox(
                       height: size.height * 0.06,
                       child: ElevatedButton(
-                        onPressed: () => controller.onSignInPressed(context),
+                        onPressed: () {
+                          controller.onSignInPressed(context);
+                          print('hhh');
+                        },
                         child: const Text(
                           'Sign In',
                           style: TextStyle(fontSize: 20),

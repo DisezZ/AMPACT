@@ -1,11 +1,14 @@
-import 'package:ampact/src/authentication/sign_in/sign_in_view.dart';
 import 'package:flutter/material.dart';
 
 import 'register_controller.dart';
 
 class RegisterView extends StatefulWidget {
-  const RegisterView({Key? key}) : super(key: key);
-  static const routeName = '/register';
+  final Function() onSignInClicked;
+
+  const RegisterView({
+    Key? key,
+    required this.onSignInClicked,
+  }) : super(key: key);
 
   @override
   _RegisterViewState createState() => _RegisterViewState();
@@ -19,7 +22,6 @@ class _RegisterViewState extends State<RegisterView> {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
         child: Center(
@@ -59,7 +61,7 @@ class _RegisterViewState extends State<RegisterView> {
                         onPressed: () {
                           setState(() {
                             controller.passwordVisibility =
-                            !controller.passwordVisibility;
+                                !controller.passwordVisibility;
                           });
                         },
                         icon: controller.passwordVisibility
@@ -86,7 +88,7 @@ class _RegisterViewState extends State<RegisterView> {
                         onPressed: () {
                           setState(() {
                             controller.confirmPasswordVisibility =
-                            !controller.confirmPasswordVisibility;
+                                !controller.confirmPasswordVisibility;
                           });
                         },
                         icon: controller.confirmPasswordVisibility
@@ -103,21 +105,28 @@ class _RegisterViewState extends State<RegisterView> {
                     height: size.height * 0.02,
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                     decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.grey,),
+                      border: Border.all(
+                        width: 1,
+                        color: Colors.grey,
+                      ),
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String?>(
                         value: controller.roleList![controller.selectedRole],
                         iconSize: 36,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Colors.black),
                         style: const TextStyle(color: Colors.black87),
                         isExpanded: true,
                         items: controller.roleList!.map(buildMenuItem).toList(),
                         onChanged: (value) => setState(() {
-                          value == controller.roleList![0]? controller.selectedRole = 0 : controller.selectedRole = 1;
+                          value == controller.roleList![0]
+                              ? controller.selectedRole = 0
+                              : controller.selectedRole = 1;
                           print(controller.roles![controller.selectedRole]);
                         }),
                       ),
@@ -127,7 +136,7 @@ class _RegisterViewState extends State<RegisterView> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () => controller.onBackToSignInPressed(context),
+                        onPressed: widget.onSignInClicked,
                         child: const Text(
                           'Back to Sign In',
                           style: TextStyle(color: Colors.blue),
@@ -141,17 +150,17 @@ class _RegisterViewState extends State<RegisterView> {
                       SizedBox(
                         height: size.height * 0.06,
                         child: ElevatedButton(
-                          onPressed: () => controller.onRegisterPressed(context),
+                          onPressed: () =>
+                              controller.onRegisterPressed(context),
                           child: const Text(
                             'Register',
                             style: TextStyle(fontSize: 20),
                           ),
                           style: ButtonStyle(
-                            shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                )),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            )),
                           ),
                         ),
                       ),
@@ -165,13 +174,12 @@ class _RegisterViewState extends State<RegisterView> {
       ),
     );
   }
+
   DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
-    value: item,
-    child: Text(
-      'Role: ' + item,
-      style: const TextStyle(fontSize: 20),
-    ),
-  );
+        value: item,
+        child: Text(
+          'Role: ' + item,
+          style: const TextStyle(fontSize: 20),
+        ),
+      );
 }
-
-

@@ -1,7 +1,11 @@
 import 'package:ampact/constants.dart';
+import 'package:ampact/src/authentication/models/user_model.dart';
+import 'package:ampact/src/core/components/custom_app_bar.dart';
+import 'package:ampact/src/core/components/custom_card.dart';
 import 'package:ampact/src/core/giver/detail/giver_detail_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterfire_ui/firestore.dart';
 import 'package:provider/provider.dart';
 
 class GiverListView extends StatefulWidget {
@@ -12,28 +16,89 @@ class GiverListView extends StatefulWidget {
 }
 
 class _GiverListViewState extends State<GiverListView> {
-  final List<String> _items = [
-    'Lutfee',
-    'Rudeus',
-    'Subaru',
-    'Kazuma'
-  ];
+  /*final queryUser = FirebaseFirestore.instance
+      .collection('users')
+      .withConverter<UserModel>(
+        fromFirestore: (snapshot, _) => UserModel.fromJSON(snapshot.data()!),
+        toFirestore: (user, _) => user.toJSON(),
+      );*/
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final user = Provider.of<DocumentSnapshot?>(context);
 
-    return Column(
-      children: [
-        _buildTitle(size),
-        _buildCardList(),
-      ],
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Elderly/Blinded',
+      ),
+      //body: Text('Hello'),
+      body: Scrollbar(
+        child: Container(
+          padding: const EdgeInsets.only(
+            left: kDefaultPadding,
+            top: kDefaultPadding / 2,
+            right: kDefaultPadding,
+            bottom: kDefaultPadding,
+          ),
+          child: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc('list')
+                .snapshots(),
+            builder: (context, snapshot) {
+              return ListView(
+                children: [
+                  for (var item in snapshot) {
+                    
+                  }
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: kDefaultPadding),
+        child: CircleAvatar(
+          radius: 30,
+          backgroundColor: theme.primaryColor,
+          child: FittedBox(
+            child: Icon(
+              Icons.add,
+              color: theme.backgroundColor,
+              size: 32,
+            ),
+          ),
+        ),
+      ),
+      /*body: FirestoreListView<UserModel>(
+        query: queryUser,
+        itemBuilder: (context, snapshot) {
+          final users = snapshot.data();
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(users.profileImage),
+            ),
+            title: Text('${users.firstName} ${users.lastName}'),
+            subtitle: const Text('Telphone number'),
+            trailing: Icon(Icons.chevron_right_sharp),
+            onTap: () {
+              print('enter detail view for ${users.firstName}');
+            },
+            onLongPress: () {
+              print('more action for ${users.firstName}');
+            },
+          );
+        },
+      ),*/
     );
   }
 
-  Widget _buildTitle(Size size) {
+  /*Widget _buildTitle(Size size) {
     return Container(
-      //color: Colors.black,
+      color: Colors.black,
       margin: const EdgeInsets.only(bottom: kDefaultPadding / 4),
       height: size.height * 0.175,
       child: Stack(
@@ -55,40 +120,40 @@ class _GiverListViewState extends State<GiverListView> {
           ),
           SafeArea(
               child: Container(
-                padding: const EdgeInsets.only(
-                  left: kDefaultPadding,
-                  top: kDefaultPadding * 1.5,
-                ),
-                width: size.width,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: size.width * 0.4,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.white.withOpacity(0.25),
-                              ),
-                              height: size.height * 0.01,
-                            ),
+            padding: const EdgeInsets.only(
+              left: kDefaultPadding,
+              top: kDefaultPadding * 1.5,
+            ),
+            width: size.width,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: size.width * 0.4,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white.withOpacity(0.25),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2),
-                            child: Image.asset('assets/images/logo_name_white.png'),
-                          )
-                        ],
+                          height: size.height * 0.01,
+                        ),
                       ),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: kDefaultPadding / 2),
+                        child: Image.asset('assets/images/logo_name_white.png'),
+                      )
+                    ],
+                  ),
                 ),
-              )
-          ),
+              ],
+            ),
+          )),
           Positioned(
             bottom: 0,
             left: 0,
@@ -102,7 +167,7 @@ class _GiverListViewState extends State<GiverListView> {
                 boxShadow: [
                   BoxShadow(
                     offset: const Offset(0, 10),
-                    blurRadius: 50,
+                    blurRadius: 5,
                     color: kPrimaryColor.withOpacity(0.23),
                   ),
                 ],
@@ -114,74 +179,6 @@ class _GiverListViewState extends State<GiverListView> {
       ),
     );
   }
-
-  /*Widget buildCardList() {
-    final userInfo = Provider.of<AsyncSnapshot<DocumentSnapshot>>(context);
-    final List<dynamic> list = userInfo.data!['list'];
-
-    return Flexible(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-        child: ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (_, index) {
-            final uid = list[index];
-            return buildAndLoadCard(index, uid);
-          },
-        ),
-      ),
-    );
-    //return Text('Hello');
-  }
-
-  Widget buildAndLoadCard(int index, String uid) {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return const Text('Loading...');
-          default:
-            return buildCard(index, uid, snapshot);
-        }
-      },
-    );
-  }
-
-  Widget _buildCard(int index, String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
-    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
-
-    return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GiverDetailView(snapshot: snapshot),
-          )
-      ),
-      child: Card(
-        key: Key('$index'),
-        child: Container(
-          color: index.isOdd? oddItemColor : evenItemColor,
-          padding: const EdgeInsets.only(
-            left: kDefaultPadding,
-            top: kDefaultPadding / 4,
-            right: kDefaultPadding,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Item #$index'),
-              Text(snapshot.data!['email']),
-            ],
-          ),
-        ),
-      ),
-    );
-  }*/
 
   Widget _buildCardList() {
     final size = MediaQuery.of(context).size;
@@ -213,13 +210,16 @@ class _GiverListViewState extends State<GiverListView> {
 
   Widget _loadCardInfo(int index, String uid) {
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+      stream:
+          FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         }
         switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return const Text('Loading...');
+          case ConnectionState.waiting:
+            return const Text('Loading...');
           default:
             return _buildCard(index, uid, snapshot);
         }
@@ -227,14 +227,17 @@ class _GiverListViewState extends State<GiverListView> {
     );
   }
 
-  Widget _buildCard(int index, String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
+  Widget _buildCard(
+      int index, String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
     final size = MediaQuery.of(context).size;
 
     return GestureDetector(
       onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => GiverDetailView(snapshot: snapshot,))
-      ),
+          MaterialPageRoute(
+              builder: (_) => GiverDetailView(
+                    snapshot: snapshot,
+                  ))),
       child: Container(
         width: size.width * 0.4,
         height: size.height * 0.25,
@@ -266,5 +269,5 @@ class _GiverListViewState extends State<GiverListView> {
         ),
       ),
     );
-  }
+  }*/
 }

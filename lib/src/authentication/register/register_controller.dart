@@ -1,15 +1,10 @@
 import 'package:ampact/src/authentication/authentication_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:ampact/src/authentication/authentication_wrapper.dart';
-import 'package:ampact/src/authentication/sign_in/sign_in_view.dart';
-import 'package:ampact/src/navigation/home/home_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:ampact/src/services/auth.dart';
-import 'package:provider/provider.dart';
 
 class RegisterController {
-
   final AuthService _auth = AuthService();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? _email = "";
@@ -23,7 +18,8 @@ class RegisterController {
 
   void onEmailSaved(String? email) => _email = email;
   String? validateEmail(String? email) {
-    RegExp regExp = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+    RegExp regExp = RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
     if (!regExp.hasMatch(email!)) {
       return 'Email is invalid';
     } else {
@@ -40,7 +36,8 @@ class RegisterController {
     }
   }
 
-  void onConfirmPasswordSaved(String? confirmPassword) => _confirmPassword = confirmPassword;
+  void onConfirmPasswordSaved(String? confirmPassword) =>
+      _confirmPassword = confirmPassword;
   String? validateConfirmPassword(String? confirmPassword) {
     if (confirmPassword != _password) {
       return 'Confirm password must match with given password';
@@ -49,15 +46,19 @@ class RegisterController {
     }
   }
 
-  void onBackToSignInPressed(BuildContext context) => Provider.of<AuthenticationProvider>(context, listen: false).changeToSignIn();
+  void onBackToSignInPressed(BuildContext context) =>
+      Provider.of<AuthenticationProvider>(context, listen: false)
+          .changeToSignIn();
 
   void onRegisterPressed(BuildContext context) async {
     final bool isFormValid = formKey.currentState!.validate();
     if (isFormValid) {
       formKey.currentState!.save();
-      dynamic result = await _auth.createUserWithEmailAndPassword(_email!, _password!, roles![selectedRole]);
+      dynamic result = await _auth.createUserWithEmailAndPassword(
+          _email!, _password!, roles![selectedRole]);
       if (result != null) {
-        Provider.of<AuthenticationProvider>(context, listen: false).changeToSignIn();
+        Provider.of<AuthenticationProvider>(context, listen: false)
+            .changeToSignIn();
         print('register successfully');
         print(result);
       } else {
