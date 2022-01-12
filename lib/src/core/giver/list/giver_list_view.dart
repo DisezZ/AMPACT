@@ -3,6 +3,7 @@ import 'package:ampact/src/authentication/models/user_model.dart';
 import 'package:ampact/src/core/components/custom_app_bar.dart';
 import 'package:ampact/src/core/components/custom_card.dart';
 import 'package:ampact/src/core/giver/detail/giver_detail_view.dart';
+import 'package:ampact/src/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
@@ -28,6 +29,7 @@ class _GiverListViewState extends State<GiverListView> {
     final size = MediaQuery.of(context).size;
     final theme = Theme.of(context);
     final user = Provider.of<DocumentSnapshot?>(context);
+    final List<dynamic> list = user!['list'];
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -42,21 +44,42 @@ class _GiverListViewState extends State<GiverListView> {
             right: kDefaultPadding,
             bottom: kDefaultPadding,
           ),
-          child: StreamBuilder<DocumentSnapshot>(
+          child: SingleChildScrollView(
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.end,
+              spacing: kDefaultPadding,
+              runSpacing: kDefaultPadding,
+              children: [
+                for (int index = 0; index < list.length; index++)
+                  _loadCardInfo(index, list[index])
+              ],
+            ),
+          ),
+          /*child: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('users')
                 .doc('list')
                 .snapshots(),
             builder: (context, snapshot) {
-              return ListView(
-                children: [
-                  for (var item in snapshot) {
-                    
-                  }
-                ],
-              );
+              if (snapshot.hasError) {
+                return Utils.showSnackBar('Opps, Something went wrong', Colors.red);
+              }
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const Center(child: CircularProgressIndicator(),);
+                default:
+                  return Scrollbar(
+                    child: ListView(
+                      children: [
+                        for (var i = 0; i < snapshot.data!['list']; i++) {
+                          const CustomCard();
+                        }
+                      ],
+                    ),
+                  );
+              }
             },
-          ),
+          ),*/
         ),
       ),
       floatingActionButton: Padding(
@@ -206,7 +229,7 @@ class _GiverListViewState extends State<GiverListView> {
         ),
       ),
     );
-  }
+  }*/
 
   Widget _loadCardInfo(int index, String uid) {
     return StreamBuilder<DocumentSnapshot>(
@@ -221,14 +244,13 @@ class _GiverListViewState extends State<GiverListView> {
           case ConnectionState.waiting:
             return const Text('Loading...');
           default:
-            return _buildCard(index, uid, snapshot);
+            return CustomCard(id: uid, snapshot: snapshot.data);
         }
       },
     );
   }
 
-  Widget _buildCard(
-      int index, String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
+  Widget _buildCard(String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
     final size = MediaQuery.of(context).size;
 
     return GestureDetector(
@@ -269,5 +291,5 @@ class _GiverListViewState extends State<GiverListView> {
         ),
       ),
     );
-  }*/
+  }
 }

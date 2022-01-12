@@ -22,9 +22,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
     final userInfo = Provider.of<DocumentSnapshot?>(context);
     final size = MediaQuery.of(context).size;
     final List<dynamic> list = userInfo!['list'];
-    for (var element in list) {
-      print('care for $element');
-    }
+    
     return Container(
       color: Theme.of(context).backgroundColor,
       child: Column(

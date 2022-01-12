@@ -1,8 +1,13 @@
 import 'package:ampact/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CustomCard extends StatefulWidget {
-  const CustomCard({Key? key}) : super(key: key);
+  final String id;
+  final DocumentSnapshot? snapshot;
+
+  const CustomCard({Key? key, required this.id, this.snapshot})
+      : super(key: key);
 
   @override
   _CustomCardState createState() => _CustomCardState();
@@ -35,12 +40,12 @@ class _CustomCardState extends State<CustomCard> {
               shape: BoxShape.circle,
             ),
             child: CircleAvatar(
-              //backgroundImage: NetworkImage(snapshot['profileImage']),
-              backgroundColor: theme.backgroundColor,
+              backgroundImage: NetworkImage(widget.snapshot!['profileImage']),
+              //backgroundColor: theme.backgroundColor,
             ),
           ),
           title: Text(
-            'Lutfee Deemae',
+            '${widget.snapshot!['firstName']} ${widget.snapshot!['lastName']}',
             style: TextStyle(fontSize: 20),
           ),
           subtitle: Text(
@@ -54,7 +59,7 @@ class _CustomCardState extends State<CustomCard> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 buildCircleIcon(Icons.call),
-                buildCircleIcon(Icons.notifications_active),
+                buildCircleIcon(Icons.visibility),
               ],
             ),
           ),
