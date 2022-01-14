@@ -1,5 +1,8 @@
 import 'package:ampact/constants.dart';
 import 'package:ampact/src/core/camera/camera_view.dart';
+import 'package:ampact/src/core/components/action_card.dart';
+import 'package:ampact/src/core/components/ampact_app_bar.dart';
+import 'package:ampact/src/core/components/summary_card.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,10 +22,58 @@ class _GiverHomeViewState extends State<GiverHomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final snapshot = Provider.of<DocumentSnapshot?>(context);
+
+    return Scaffold(
+      appBar: AmpactAppBar(
+        title: 'Home',
+      ),
+      body: Container(
+          color: theme.backgroundColor,
+          padding: EdgeInsets.all(kDefaultPadding),
+          child: Column(
+            children: [
+              SummaryCard(
+                snapshot: snapshot,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: kDefaultPadding),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: size.width / 2 - kDefaultPadding * 1.5,
+                      child: ActionCard(title: 'Google Map'),
+                    ),
+                    Spacer(),
+                    SizedBox(
+                      width: size.width / 2 - kDefaultPadding * 1.5,
+                      child: ActionCard(),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => _speak(),
+                child: Text('TTS Pressed'),
+              ),
+              ElevatedButton(
+                onPressed: () => _camera(),
+                child: Text('Camera Pressed'),
+              ),
+            ],
+          )),
+    );
+  }
+
+  /*
+  @override
+  Widget build(BuildContext context) {
     final userInfo = Provider.of<DocumentSnapshot?>(context);
     final size = MediaQuery.of(context).size;
     final List<dynamic> list = userInfo!['list'];
-    
+
     return Container(
       color: Theme.of(context).backgroundColor,
       child: Column(
@@ -40,7 +91,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
         ],
       ),
     );
-  }
+  }*/
 
   Future _speak() async {
     print(await flutterTTS.getLanguages);
@@ -59,7 +110,7 @@ class _GiverHomeViewState extends State<GiverHomeView> {
           ),
         ));
   }
-
+/*
   Widget _buildTitle(DocumentSnapshot? userInfo, Size size) {
     return Container(
       //color: Colors.black,
@@ -336,5 +387,5 @@ class _GiverHomeViewState extends State<GiverHomeView> {
         ),
       ],
     );
-  }
+  }*/
 }

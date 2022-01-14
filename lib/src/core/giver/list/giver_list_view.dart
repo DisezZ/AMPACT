@@ -1,11 +1,16 @@
 import 'package:ampact/constants.dart';
 import 'package:ampact/src/authentication/models/user_model.dart';
-import 'package:ampact/src/core/components/custom_app_bar.dart';
-import 'package:ampact/src/core/components/custom_card.dart';
+import 'package:ampact/src/core/components/ampact_app_bar.dart';
+import 'package:ampact/src/core/components/expansion_card.dart';
+import 'package:ampact/src/core/components/outlined_circle_icon.dart';
+import 'package:ampact/src/core/components/rounded_bordered_box.dart';
 import 'package:ampact/src/core/giver/detail/giver_detail_view.dart';
+import 'package:ampact/src/core/giver/list/giver_list_controller.dart';
 import 'package:ampact/src/utils/utils.dart';
+import 'package:animate_icons/animate_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutterfire_ui/firestore.dart';
 import 'package:provider/provider.dart';
 
@@ -17,12 +22,7 @@ class GiverListView extends StatefulWidget {
 }
 
 class _GiverListViewState extends State<GiverListView> {
-  /*final queryUser = FirebaseFirestore.instance
-      .collection('users')
-      .withConverter<UserModel>(
-        fromFirestore: (snapshot, _) => UserModel.fromJSON(snapshot.data()!),
-        toFirestore: (user, _) => user.toJSON(),
-      );*/
+  final controller = GiverListController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,26 +32,28 @@ class _GiverListViewState extends State<GiverListView> {
     final List<dynamic> list = user!['list'];
 
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: AmpactAppBar(
         title: 'Elderly/Blinded',
       ),
       //body: Text('Hello'),
       body: Scrollbar(
         child: Container(
+          color: theme.backgroundColor,
           padding: const EdgeInsets.only(
             left: kDefaultPadding,
             top: kDefaultPadding / 2,
             right: kDefaultPadding,
-            bottom: kDefaultPadding,
+            bottom: kDefaultPadding * 2,
           ),
           child: SingleChildScrollView(
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.end,
-              spacing: kDefaultPadding,
+              //spacing: kDefaultPadding,
               runSpacing: kDefaultPadding,
               children: [
                 for (int index = 0; index < list.length; index++)
-                  _loadCardInfo(index, list[index])
+                  _loadCardInfo(index, list[index]),
+                Container(margin: EdgeInsets.only(bottom: kDefaultPadding * 4)),
               ],
             ),
           ),
@@ -83,6 +85,28 @@ class _GiverListViewState extends State<GiverListView> {
         ),
       ),
       floatingActionButton: Padding(
+        padding: EdgeInsets.symmetric(vertical: kDefaultPadding),
+        child: SpeedDial(
+          icon: Icons.add,
+          activeIcon: Icons.close,
+          animationSpeed: 300,
+          overlayColor: Colors.black,
+          backgroundColor: theme.primaryColor,
+          children: [
+            SpeedDialChild(
+              child: Icon(Icons.qr_code_scanner),
+              label: 'Scan QRCode',
+              onTap: () => controller.onTapScanQRCode(context, user['uid']),
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.qr_code_2),
+              label: 'Create QRCode',
+              onTap: () => controller.onTapCreateQRCode(context, user['uid']),
+            ),
+          ],
+        ),
+      ),
+      /*floatingActionButton: Padding(
         padding: EdgeInsets.only(bottom: kDefaultPadding),
         child: CircleAvatar(
           radius: 30,
@@ -95,7 +119,7 @@ class _GiverListViewState extends State<GiverListView> {
             ),
           ),
         ),
-      ),
+      ),*/
       /*body: FirestoreListView<UserModel>(
         query: queryUser,
         itemBuilder: (context, snapshot) {
@@ -238,19 +262,55 @@ class _GiverListViewState extends State<GiverListView> {
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Utils.showSnackBar('Error: ${snapshot.error}', Colors.red);
         }
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return const Text('Loading...');
+            return loadingIndicator();
           default:
-            return CustomCard(id: uid, snapshot: snapshot.data);
+            return ExpansionCard(
+              uid: uid,
+              snapshot: snapshot.data,
+              actionIcons: [
+                OutlinedCircleIcon(
+                  iconData: Icons.call,
+                  onTap: () {
+                    controller.onTapPhoneCall(snapshot.data!['phoneNumber']);
+                  },
+                ),
+                OutlinedCircleIcon(
+                  iconData: Icons.map,
+                  onTap: () {
+                    controller.onTapTrackLocation(context, uid);
+                  },
+                ),
+                OutlinedCircleIcon(
+                  iconData: Icons.visibility,
+                  onTap: () {
+                    controller.onTapLiveView(context, uid);
+                  },
+                ),
+              ],
+            );
         }
       },
     );
   }
 
-  Widget _buildCard(String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
+  Widget loadingIndicator() {
+    final size = MediaQuery.of(context).size;
+    return SizedBox(
+      width: size.width,
+      height: 80,
+      child: RoundedBorderedBox(
+        child: FittedBox(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
+
+  /*Widget _buildCard(String uid, AsyncSnapshot<DocumentSnapshot> snapshot) {
     final size = MediaQuery.of(context).size;
 
     return GestureDetector(
@@ -291,5 +351,5 @@ class _GiverListViewState extends State<GiverListView> {
         ),
       ),
     );
-  }
+  }*/
 }

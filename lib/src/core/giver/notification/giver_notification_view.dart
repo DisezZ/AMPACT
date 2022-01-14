@@ -1,5 +1,5 @@
 import 'package:ampact/src/core/camera/camera_view.dart';
-import 'package:ampact/src/core/components/custom_app_bar.dart';
+import 'package:ampact/src/core/components/ampact_app_bar.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +16,7 @@ class _GiverNotificationViewState extends State<GiverNotificationView> {
     final Size _size = MediaQuery.of(context).size;
     final ThemeData _theme = Theme.of(context);
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: AmpactAppBar(
         leading: const CircleAvatar(
           backgroundColor: Colors.red,
         ),
@@ -33,10 +33,7 @@ class _GiverNotificationViewState extends State<GiverNotificationView> {
   }
 
   Widget more() {
-    return IconButton(
-      onPressed: () {},
-      icon: Icon(Icons.more_vert),
-    );
+    return Icon(Icons.more_vert);
   }
 
   void _camera() async {

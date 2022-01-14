@@ -1,5 +1,5 @@
 import 'package:ampact/constants.dart';
-import 'package:ampact/src/core/components/custom_app_bar.dart';
+import 'package:ampact/src/core/components/ampact_app_bar.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +46,10 @@ class _CameraViewState extends State<CameraView> {
       );
     }
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: AmpactAppBar(
+        isMain: false,
+        title: 'Camera',
+      ),
       body: Column(
         children: [
           Padding(

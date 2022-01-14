@@ -1,18 +1,29 @@
 import 'package:ampact/constants.dart';
+import 'package:ampact/src/core/components/rounded_bordered_box.dart';
 import 'package:flutter/material.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({
+class AmpactAppBar extends StatefulWidget implements PreferredSizeWidget {
+  final Widget? leading;
+  final String title;
+  final Widget? action;
+  final bool isMain;
+
+  const AmpactAppBar({
     Key? key,
     this.leading,
     this.title = '',
     this.action,
+    this.isMain = true,
   }) : super(key: key);
 
-  final Widget? leading;
-  final String title;
-  final Widget? action;
+  @override
+  Size get preferredSize => const Size.fromHeight(130);
 
+  @override
+  State<AmpactAppBar> createState() => _AmpactAppBarState();
+}
+
+class _AmpactAppBarState extends State<AmpactAppBar> {
   @override
   Widget build(BuildContext context) {
     final ThemeData _theme = Theme.of(context);
@@ -39,9 +50,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Positioned(
             bottom: 75,
             left: kDefaultPadding,
-            height: 35,
+            height: 30,
             child: FittedBox(
-              child: leading,
+              child: widget.isMain ? widget.leading : buildBackActionIcon(),
             ),
           ),
           Positioned(
@@ -79,9 +90,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Positioned(
             bottom: 75,
             right: kDefaultPadding,
-            height: 35,
+            height: 30,
             child: FittedBox(
-              child: action,
+              child: widget.action,
             ),
           ),
           Positioned(
@@ -102,12 +113,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ],
               ),
-              child: Center(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+              child: RoundedBorderedBox(
+                isPadding: false,
+                child: Center(
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
               ),
@@ -118,6 +132,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  @override
-  Size get preferredSize => const Size.fromHeight(130);
+  Widget buildBackActionIcon() {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pop(true),
+      child: Icon(
+        Icons.arrow_back_ios_new,
+        color: Colors.white,
+      ),
+    );
+  }
 }
