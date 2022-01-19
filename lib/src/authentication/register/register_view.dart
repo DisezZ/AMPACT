@@ -36,7 +36,7 @@ class _RegisterViewState extends State<RegisterView> {
                     height: size.height * 0.02,
                   ),
                   TextFormField(
-                    onSaved: controller.onEmailSaved,
+                    controller: controller.email,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       hintText: 'Type your email',
@@ -51,7 +51,7 @@ class _RegisterViewState extends State<RegisterView> {
                     height: size.height * 0.02,
                   ),
                   TextFormField(
-                    onChanged: controller.onPasswordChanged,
+                    controller: controller.password,
                     obscureText: !controller.passwordVisibility,
                     decoration: InputDecoration(
                       labelText: 'Password',
@@ -78,7 +78,7 @@ class _RegisterViewState extends State<RegisterView> {
                     height: size.height * 0.02,
                   ),
                   TextFormField(
-                    onSaved: controller.onConfirmPasswordSaved,
+                    controller: controller.confirmPassword,
                     obscureText: !controller.confirmPasswordVisibility,
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',

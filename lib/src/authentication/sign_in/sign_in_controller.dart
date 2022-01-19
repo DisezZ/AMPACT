@@ -5,13 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:ampact/src/authentication/register/register_view.dart';
-import 'package:ampact/src/navigation/home/home_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth.dart';
 
 class SignInController {
-  final AuthService _auth = AuthService();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -38,10 +36,6 @@ class SignInController {
 
   void onForgotPasswordPressed(BuildContext context) =>
       Navigator.pushNamed(context, '/');
-
-  void onRegisterNowPressed(BuildContext context) =>
-      Provider.of<AuthenticationProvider>(context, listen: false)
-          .changeToRegister();
 
   Future onSignInPressed(BuildContext context) async {
     final bool isFormValid = formKey.currentState!.validate();

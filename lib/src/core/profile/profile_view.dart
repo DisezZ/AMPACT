@@ -27,7 +27,7 @@ class _ProfileViewState extends State<ProfileView> {
         action: GestureDetector(
           onTap: () => FirebaseAuth.instance.signOut(),
           child: Icon(
-            Icons.more_vert,
+            Icons.logout,
             color: Colors.white,
           ),
         ),

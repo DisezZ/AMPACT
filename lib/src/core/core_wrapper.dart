@@ -1,7 +1,4 @@
-import 'package:ampact/src/authentication/models/user_info.dart';
-import 'package:ampact/src/core/giver/giver_provider.dart';
-import 'package:ampact/src/core/giver/giver_wrapper.dart';
-import 'package:ampact/src/core/receiver/receiver_wrapper.dart';
+import 'package:ampact/src/core/core_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -44,18 +41,13 @@ class _CoreWrapperState extends State<CoreWrapper> {
   }
 
   Widget checkRole(AsyncSnapshot<DocumentSnapshot> snapshot) {
-    if (snapshot.data!['role'] == 'giver') {
-      return MultiProvider(
-        providers: [
-          Provider<DocumentSnapshot?>(
-            create: (_) => snapshot.data,
-          ),
-        ],
-        child: const GiverWrapper(),
-      );
-    } else {
-      return const ReceiverWrapper();
-    }
+    return MultiProvider(
+      providers: [
+        Provider<DocumentSnapshot?>(
+          create: (_) => snapshot.data,
+        ),
+      ],
+      child: const CoreView(),
+    );
   }
 }
-//ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider())

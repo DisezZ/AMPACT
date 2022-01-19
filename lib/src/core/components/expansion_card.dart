@@ -1,8 +1,7 @@
 import 'package:ampact/constants.dart';
 import 'package:ampact/src/core/components/outlined_circle_avatar.dart';
-import 'package:ampact/src/core/components/outlined_circle_icon.dart';
 import 'package:ampact/src/core/components/rounded_bordered_box.dart';
-import 'package:ampact/src/core/giver/list/giver_list_controller.dart';
+import 'package:ampact/src/core/party/party_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +19,6 @@ class ExpansionCard extends StatefulWidget {
 }
 
 class _ExpansionCardState extends State<ExpansionCard> {
-  final controller = GiverListController();
 
   @override
   Widget build(BuildContext context) {

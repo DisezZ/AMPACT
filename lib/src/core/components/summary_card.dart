@@ -41,15 +41,6 @@ class _SummaryCardState extends State<SummaryCard> {
               ),
             ],
           ),
-          /*ListTile(
-            leading: OutlinedCircleAvatar(
-              imgUrl: widget.snapshot!['profileImage'],
-            ),
-            title: Text(
-              '${widget.snapshot!['firstName']} ${widget.snapshot!['lastName']}',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),*/
           const Divider(
             color: Colors.black,
           ),
@@ -57,9 +48,17 @@ class _SummaryCardState extends State<SummaryCard> {
             padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
             child: Column(
               children: [
-                _buildProfileSummary('Role', 'Caretaker'),
-                _buildProfileSummary('Under Cared', '${list.length} People'),
-                _buildProfileSummary('Notification', '0'),
+                widget.snapshot!['role'] == 'giver'
+                    ? _buildProfileSummary('Role', 'Caretaker')
+                    : _buildProfileSummary('Role', 'Elderly/Blinded'),
+                widget.snapshot!['role'] == 'giver'
+                    ? _buildProfileSummary(
+                        'Under Cared', '${list.length} People')
+                    : _buildProfileSummary(
+                        'Watched By', '${list.length} People'),
+                widget.snapshot!['role'] == 'giver'
+                    ? _buildProfileSummary('Notification', '0')
+                    : Container(),
               ],
             ),
           )

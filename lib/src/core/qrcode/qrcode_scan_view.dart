@@ -1,19 +1,12 @@
 import 'dart:io';
 
 import 'package:ampact/constants.dart';
-import 'package:ampact/src/core/components/ampact_app_bar.dart';
 import 'package:ampact/src/core/components/rounded_bordered_box.dart';
-import 'package:ampact/src/core/giver/giver_controller.dart';
-import 'package:ampact/src/core/giver/list/giver_list_controller.dart';
-import 'package:ampact/src/core/giver/list/giver_list_view.dart';
-
-import 'package:ampact/src/utils/utils.dart';
+import 'package:ampact/src/core/party/party_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRCodeScanView extends StatefulWidget {
@@ -25,7 +18,7 @@ class QRCodeScanView extends StatefulWidget {
 
 class _QRCodeScanViewState extends State<QRCodeScanView> {
   final qrKey = GlobalKey(debugLabel: 'QR');
-  final listController = GiverListController();
+  final listController = PartyController();
   final uid = FirebaseAuth.instance.currentUser!.uid.trim();
   final ref = FirebaseFirestore.instance.collection('users');
   QRViewController? controller;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AuthenticationProvider with ChangeNotifier {
+/*class AuthenticationProvider with ChangeNotifier {
   final String _signInPage = 'signin';
   final String _registerPage = 'register';
   String _currentPage = 'signin';
@@ -17,4 +17,4 @@ class AuthenticationProvider with ChangeNotifier {
     _currentPage = _registerPage;
     notifyListeners();
   }
-}
+}*/
