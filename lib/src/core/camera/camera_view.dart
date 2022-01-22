@@ -1,109 +1,144 @@
 import 'dart:developer';
-import 'package:ampact/constants.dart';
-import 'package:ampact/src/core/components/ampact_app_bar.dart';
+import 'dart:io';
+import 'dart:isolate';
+
+import 'package:ampact/src/core/tflite/classifier.dart';
+import 'package:ampact/src/core/tflite/stats.dart';
+import 'package:ampact/src/utils/image_utils.dart';
+import 'package:ampact/src/utils/isolate_utils.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:tflite/tflite.dart';
+import 'package:image/image.dart' as imglib;
 
 class CameraView extends StatefulWidget {
-  const CameraView({
-    this.cameras,
-    Key? key,
-  }) : super(key: key);
+  final Function(List<dynamic> detection)? resultsCallback;
+  final Function(Stats stats)? statsCallback;
 
-  final List<CameraDescription>? cameras;
+  const CameraView({
+    Key? key,
+    this.resultsCallback,
+    this.statsCallback,
+  }) : super(key: key);
 
   @override
   _CameraViewState createState() => _CameraViewState();
 }
 
-class _CameraViewState extends State<CameraView> {
-  late CameraController controller;
-  late CameraImage image;
+class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
+  late List<CameraDescription> cameras;
+  late CameraController cameraController;
+  late bool detecting;
+  late Classifier classifier;
+  late IsolateUtils isolateUtils;
 
   @override
   void initState() {
     super.initState();
-    loadModel();
-    controller = CameraController(widget.cameras![0], ResolutionPreset.max);
-    controller.initialize().then((value) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        controller.startImageStream((image) {
-          image = image;
-          runModel();
-        });
-      });
-    });
+    WidgetsBinding.instance!.addObserver(this);
+    isolateUtils = IsolateUtils();
+    classifier = Classifier();
+    detecting = false;
   }
 
-  @override
-  void dispose() async {
-    Tflite.close();
-    controller.dispose();
-    super.dispose();
+  Future<void> initializeCamera() async {
+    try {
+      cameras = await availableCameras();
+      cameraController = CameraController(cameras[0], ResolutionPreset.low,
+          enableAudio: false);
+      await cameraController.initialize().then((_) async {
+        await cameraController.startImageStream(onLatestImageAvailable);
+      });
+    } catch (e) {}
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
-      return const SizedBox(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-    return Scaffold(
-      appBar: AmpactAppBar(
-        isMain: false,
-        title: 'Camera',
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(kDefaultPadding),
-            child: Center(
-              child: SizedBox(
-                height: 300,
-                width: 400,
-                child: CameraPreview(controller),
-              ),
-            ),
-          )
-        ],
-      ),
+    return FutureBuilder(
+      future: initializeCamera(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          if (snapshot.hasError) {
+            return Container(
+              child: Text('Camera Error'),
+            );
+          } else {
+            return Column(
+              children: [
+                AspectRatio(
+                  aspectRatio: cameraController.value.aspectRatio,
+                  child: CameraPreview(cameraController),
+                ),
+              ],
+            );
+          }
+        }
+      },
     );
   }
 
-  loadModel() async {
-    await Tflite.loadModel(
-      model: 'assets/model/hand_landmark_full.tflite',
-      //labels: 'assets/model/mobilenet_v1_1.0_224.txt',
-    );
-  }
+  onLatestImageAvailable(CameraImage cameraImage) async {
+    if (classifier.interpreter != null) {
+      if (detecting) {
+        return;
+      }
 
-  runModel() async {
-    if (image != null) {
-      var estimations = await Tflite.runModelOnFrame(
-        bytesList: image.planes.map((plane) {
-          return plane.bytes;
-        }).toList(),
-        imageHeight: image.height,
-        imageWidth: image.width,
-        imageMean: 127.5,
-        imageStd: 127.5,
-        rotation: 90,
-        numResults: 2,
-        threshold: 0.1,
-        asynch: true,
-      );
-      estimations!.forEach((element) {
-        setState(() {});
+      setState(() {
+        detecting = true;
       });
-      inspect(estimations);
-      print(estimations);
+
+      var uiThreadTimeStart = DateTime.now().millisecondsSinceEpoch;
+
+      var isolateData = IsolateData(
+        cameraImage: cameraImage,
+        interpreterAddress: classifier.interpreter.address,
+      );
+
+      //print('Format:: ${cameraImage.format.group}');
+      //Image image =
+          //ImageUtils.convertCameraImage(isolateData.cameraImage) as Image;
+
+      Map<String, dynamic> inferenceResults = await inference(isolateData);
+
+      var uiThreadInferenceElapsedTime =
+          DateTime.now().millisecondsSinceEpoch - uiThreadTimeStart;
+
+      /*setState(() {
+        detecting = false;
+      });*/
     }
+  }
+
+  Future<Map<String, dynamic>> inference(IsolateData isolateData) async {
+    ReceivePort responsePort = ReceivePort();
+    isolateUtils.sendPort
+        .send(isolateData..responsePort = responsePort.sendPort);
+    var result = await responsePort.first;
+    return result;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.paused:
+        cameraController.stopImageStream();
+        break;
+      case AppLifecycleState.resumed:
+        if (!cameraController.value.isStreamingImages) {
+          await cameraController.startImageStream(onLatestImageAvailable);
+        }
+        break;
+      default:
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    cameraController.dispose();
+    super.dispose();
   }
 }

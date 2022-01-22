@@ -72,8 +72,11 @@ class _HomeViewState extends State<HomeView> {
     await availableCameras().then((value) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CameraView(
-              cameras: value,
+            builder: (_) => Scaffold(
+              appBar: AmpactAppBar(
+                title: 'Camera',
+              ),
+              body: CameraView(),
             ),
           ),
         ));
