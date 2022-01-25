@@ -12,7 +12,7 @@ class IsolateUtils {
   static const DEBUG_NAME = 'InferenceIsolate';
 
   late Isolate _isolate;
-  late SendPort _sendPort;
+  SendPort? _sendPort;
   final _isolateReady = Completer<void>();
 
   IsolateUtils() {
@@ -45,8 +45,8 @@ class IsolateUtils {
           if (Platform.isAndroid) {
             image = copyRotate(image, 90);
           }
-          //Map<String, dynamic>? results = classifier.detect(image);
-          //isolateData.responsePort!.send(results);
+          Map<String, dynamic>? results = classifier.detect(image);
+          isolateData.responsePort!.send(results);
         }
       }
     });
@@ -66,8 +66,8 @@ class IsolateUtils {
     }
   }
 
-  SendPort get sendPort => _sendPort;
-  Future<void> get isolaReady => _isolateReady.future;
+  SendPort? get sendPort => _sendPort;
+  Future<void> get isolateReady => _isolateReady.future;
 
   void dispose() {
     _isolate.kill();

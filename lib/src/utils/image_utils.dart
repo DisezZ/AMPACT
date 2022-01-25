@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as imglib;
+import 'package:path_provider/path_provider.dart';
 
 class ImageUtils {
   /// Converts a [CameraImage] in YUV420 format to [imglib.Image] in RGB format
@@ -63,5 +66,14 @@ class ImageUtils {
         ((b << 16) & 0xff0000) |
         ((g << 8) & 0xff00) |
         (r & 0xff);
+  }
+
+  static void saveImage(imglib.Image image, [int i = 0]) async {
+    List<int> jpeg = imglib.JpegEncoder().encodeImage(image);
+    final appDir = await getExternalStorageDirectory();
+    final appPath = appDir!.path;
+    final fileOnDevice = File('$appPath/out$i.jpg');
+    await fileOnDevice.writeAsBytes(jpeg, flush: true);
+    print('Saved $appPath/out$i.jpg');
   }
 }
