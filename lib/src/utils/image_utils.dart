@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as imglib;
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
 class ImageUtils {
@@ -76,4 +80,22 @@ class ImageUtils {
     await fileOnDevice.writeAsBytes(jpeg, flush: true);
     print('Saved $appPath/out$i.jpg');
   }
+
+  static Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  Future<Image> tinypng(Uint8List uint8list) async {
+
+  // copy from decodeImageFromList of package:flutter/painting.dart
+  final codec = await instantiateImageCodec(uint8list);
+  final frameInfo = await codec.getNextFrame();
+  return frameInfo.image;
+}
 }

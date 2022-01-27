@@ -2,85 +2,72 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:ampact/src/core/tflite/classifier.dart';
+import 'package:ampact/src/core/tflite/hand_landmark_services.dart';
 import 'package:ampact/src/utils/image_utils.dart';
 import 'package:camera/camera.dart';
 import 'package:image/image.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
+import 'package:image/image.dart' as imglib;
+
 class IsolateUtils {
-  static const DEBUG_NAME = 'InferenceIsolate';
+  Isolate? _isolate;
+  late SendPort _sendPort;
+  late ReceivePort _receivePort;
 
-  late Isolate _isolate;
-  SendPort? _sendPort;
-  final _isolateReady = Completer<void>();
+  SendPort get sendPort => _sendPort;
 
-  IsolateUtils() {
-    init();
-  }
-
-  Future<void> init() async {
-    final receivePort = ReceivePort();
-    receivePort.listen(_handleMessage);
-    _isolate = await Isolate.spawn(
-      _isolateEntry,
-      receivePort.sendPort,
-      debugName: DEBUG_NAME,
+  Future<void> initIsolate() async {
+    _receivePort = ReceivePort();
+    _isolate = await Isolate.spawn<SendPort>(
+      _entryPoint,
+      _receivePort.sendPort,
     );
+
+    _sendPort = await _receivePort.first;
   }
 
-  static void _isolateEntry(dynamic message) async {
-    SendPort sendPort;
-    final receivePort = ReceivePort();
+  static void _entryPoint(SendPort mainSendPort) async {
+    final childReceivePort = ReceivePort();
+    mainSendPort.send(childReceivePort.sendPort);
 
-    receivePort.listen((dynamic message) async {
-      if (message is IsolateData) {
-        final isolateData = message;
-        if (isolateData != null) {
-          Classifier classifier = Classifier(
-            interpreter:
-                Interpreter.fromAddress(isolateData.interpreterAddress),
-          );
-          Image image = ImageUtils.convertCameraImage(isolateData.cameraImage);
-          if (Platform.isAndroid) {
-            image = copyRotate(image, 90);
-          }
-          Map<String, dynamic>? results = classifier.detect(image);
-          isolateData.responsePort!.send(results);
-        }
+    await for (final _IsolateData? isolateData in childReceivePort) {
+      if (isolateData != null) {
+        final results = isolateData.handler(isolateData.params);
+        isolateData.responsePort.send(results);
       }
-    });
-
-    if (message is SendPort) {
-      sendPort = message;
-      sendPort.send(receivePort.sendPort);
-      return;
     }
   }
 
-  void _handleMessage(dynamic message) {
-    if (message is SendPort) {
-      _sendPort = message;
-      _isolateReady.complete();
-      return;
-    }
+  void sendMessage({
+    required Function handler,
+    required Map<String, dynamic> params,
+    required SendPort sendPort,
+    required ReceivePort responsePort,
+  }) {
+    final isolateData = _IsolateData(
+      handler: handler,
+      params: params,
+      responsePort: responsePort.sendPort,
+    );
+    sendPort.send(isolateData);
   }
-
-  SendPort? get sendPort => _sendPort;
-  Future<void> get isolateReady => _isolateReady.future;
 
   void dispose() {
-    _isolate.kill();
+    _receivePort.close();
+    _isolate?.kill(priority: Isolate.immediate);
+    _isolate = null;
   }
 }
 
-class IsolateData {
-  CameraImage cameraImage;
-  int interpreterAddress;
-  SendPort? responsePort;
+class _IsolateData {
+  Function handler;
+  Map<String, dynamic> params;
+  SendPort responsePort;
 
-  IsolateData({
-    required this.cameraImage,
-    required this.interpreterAddress,
+  _IsolateData({
+    required this.handler,
+    required this.params,
+    required this.responsePort,
   });
 }

@@ -3,10 +3,12 @@ import 'package:ampact/src/core/camera/camera_view.dart';
 import 'package:ampact/src/core/components/action_card.dart';
 import 'package:ampact/src/core/components/ampact_app_bar.dart';
 import 'package:ampact/src/core/components/summary_card.dart';
+import 'package:ampact/src/core/pointing_word_reader/pointing_word_reader_view.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
@@ -69,16 +71,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void _camera() async {
-    await availableCameras().then((value) => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AmpactAppBar(
-                title: 'Camera',
-              ),
-              body: CameraView(),
-            ),
-          ),
-        ));
+    await availableCameras().then((value) => pushNewScreen(context,
+        screen: PointingWordReaderView(), withNavBar: false));
   }
 }
