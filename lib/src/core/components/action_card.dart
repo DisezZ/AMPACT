@@ -12,7 +12,7 @@ class ActionCard extends StatefulWidget {
     Key? key,
     this.title = '',
     this.content,
-    this.actionIcon = Icons.add,
+    this.actionIcon,
     this.action,
   }) : super(key: key);
 
@@ -26,7 +26,7 @@ class _ActionCardState extends State<ActionCard> {
     final size = MediaQuery.of(context).size;
 
     return SizedBox(
-      width: size.width / 2 - kDefaultPadding * 1.5,
+      width: size.width / 2 - kDefaultPadding * 1.75,
       height: size.height * 0.2,
       child: RoundedBorderedBox(
         isPadding: false,
@@ -42,14 +42,22 @@ class _ActionCardState extends State<ActionCard> {
             Divider(
               color: Colors.black,
             ),
-            widget.content ?? Container(),
-            GestureDetector(
-              child: Icon(
-                widget.actionIcon,
-                size: 80,
-              ),
-              onTap: widget.action,
-            ),
+            widget.content == null
+                ? Container()
+                : Expanded(
+                    child: Center(
+                      child: widget.content,
+                    ),
+                  ),
+            /*widget.actionIcon == null
+                ? Container()
+                : GestureDetector(
+                    child: Icon(
+                      widget.actionIcon,
+                      size: 80,
+                    ),
+                    onTap: widget.action,
+                  ),*/
           ],
         ),
       ),

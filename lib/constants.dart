@@ -9,6 +9,13 @@ const double kDefaultPadding = 16.0;
 
 mixin ModelFile {
   static const String directory = 'model/';
-  static const handLandmark = directory + 'hand_landmark_full.tflite';
-  static const textDetector = directory + 'text_detector_fp16.tflite';
+  static const String handLandmark = directory + 'hand_landmark_full.tflite';
+  static const String textDetector = directory + 'text_detector_fp16.tflite';
+}
+
+mixin ImageFile {
+  static const String directory = 'images/';
+  static const String flutterLogo = directory + 'flutter_logo.png';
+  static const String mediapipeLogo = directory + 'mediapipe_logo.png';
+  static const String firebaseLogo = directory + 'firebase_logo.png';
 }

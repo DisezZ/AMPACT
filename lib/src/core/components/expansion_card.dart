@@ -19,7 +19,6 @@ class ExpansionCard extends StatefulWidget {
 }
 
 class _ExpansionCardState extends State<ExpansionCard> {
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -39,10 +38,10 @@ class _ExpansionCardState extends State<ExpansionCard> {
             '${widget.snapshot!['firstName']} ${widget.snapshot!['lastName']}',
             style: TextStyle(fontSize: 20),
           ),
-          subtitle: Text(
+          /*subtitle: Text(
             '${widget.snapshot!['role']} ${widget.snapshot!['uid']}',
-          ),
-          isThreeLine: true,
+          ),*/
+          /*isThreeLine: true,*/
           onLongPress: () => print('delete'),
         ),
         children: [

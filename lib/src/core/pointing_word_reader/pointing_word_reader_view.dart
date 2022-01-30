@@ -25,6 +25,7 @@ class _PointingWordReaderViewState extends State<PointingWordReaderView> {
     return Scaffold(
       appBar: AmpactAppBar(
         title: 'Pointing Word Reader',
+        isMain: false,
       ),
       body: Stack(
         children: [

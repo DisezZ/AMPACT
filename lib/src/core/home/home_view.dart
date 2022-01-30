@@ -31,35 +31,49 @@ class _HomeViewState extends State<HomeView> {
       appBar: const AmpactAppBar(
         title: 'Home',
       ),
-      body: Container(
-          color: theme.backgroundColor,
-          padding: EdgeInsets.all(kDefaultPadding),
-          child: Column(
-            children: [
-              SummaryCard(
-                snapshot: snapshot,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: kDefaultPadding),
-                child: Row(
-                  children: [
-                    ActionCard(
-                      title: '',
-                      actionIcon: Icons.login,
-                    ),
-                  ],
+      body: SingleChildScrollView(
+        child: Container(
+            color: theme.backgroundColor,
+            padding: EdgeInsets.all(kDefaultPadding),
+            child: Column(
+              children: [
+                SummaryCard(
+                  snapshot: snapshot,
                 ),
-              ),
-              ElevatedButton(
-                onPressed: () => _speak(),
-                child: Text('TTS Pressed'),
-              ),
-              ElevatedButton(
-                onPressed: () => _camera(),
-                child: Text('Camera Pressed'),
-              ),
-            ],
-          )),
+                Container(
+                  padding: EdgeInsets.only(top: kDefaultPadding),
+                  child: Text(
+                    'Powered By',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: kDefaultPadding),
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    runSpacing: kDefaultPadding,
+                    spacing: kDefaultPadding,
+                    children: [
+                      ActionCard(
+                        title: 'Flutter',
+                        content: Image.asset('assets/' + ImageFile.flutterLogo),
+                      ),
+                      ActionCard(
+                        title: 'Firebase',
+                        content:
+                            Image.asset('assets/' + ImageFile.firebaseLogo),
+                      ),
+                      ActionCard(
+                        title: 'Mediapipe',
+                        content:
+                            Image.asset('assets/' + ImageFile.mediapipeLogo),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )),
+      ),
     );
   }
 
@@ -67,7 +81,8 @@ class _HomeViewState extends State<HomeView> {
     print(await flutterTTS.getLanguages);
     //await flutterTTS.setLanguage('ja-JP');
     await flutterTTS.setPitch(1);
-    await flutterTTS.speak('Genius');
+    await Future.delayed(
+        Duration(milliseconds: 300), () => flutterTTS.speak('Genius'));
   }
 
   void _camera() async {
