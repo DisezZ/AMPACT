@@ -33,7 +33,7 @@ class BoundingBoxPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final linePaint = Paint()
+    final paint = Paint()
       ..color = Colors.red
       ..strokeWidth = 1;
     final RecognisedText recognisedText = results!['recognisedText'];
@@ -42,15 +42,39 @@ class BoundingBoxPainter extends CustomPainter {
     for (var block in recognisedText.blocks) {
       for (var line in block.lines) {
         for (var element in line.elements) {
-          final points = element.cornerPoints;
-          canvas.drawLine(
+          //final points = element.cornerPoints;
+          final left = element.rect.left / originalSize.height * size.width;
+          final bottom =
+              element.rect.top / originalSize.width * size.height + 5;
+          final right = element.rect.right / originalSize.height * size.width;
+          final top =
+              element.rect.bottom / originalSize.width * size.height + 5;
+
+          canvas.drawLine(Offset(left, top), Offset(right, top), paint);
+          canvas.drawLine(Offset(right, top), Offset(right, bottom), paint);
+          canvas.drawLine(Offset(right, bottom), Offset(left, bottom), paint);
+          canvas.drawLine(Offset(left, bottom), Offset(left, top), paint);
+
+          /*canvas.drawCircle(
+              Offset(
+              size.width - points[0].dy / originalSize.height * size.width,
+              points[0].dx / originalSize.width * size.height),
+              2,
+              paint);
+          canvas.drawCircle(
+              Offset(
+                  size.width - points[2].dy / originalSize.height * size.width,
+                  points[2].dx / originalSize.width * size.height),
+              2,
+              paint);*/
+          /*canvas.drawLine(
               Offset(
                   size.width - points[0].dy / originalSize.height * size.width,
                   points[0].dx / originalSize.width * size.height),
               Offset(
                   size.width - points[1].dy / originalSize.height * size.width,
                   points[1].dx / originalSize.width * size.height),
-              linePaint);
+              paint);
           canvas.drawLine(
               Offset(
                   size.width - points[1].dy / originalSize.height * size.width,
@@ -58,7 +82,7 @@ class BoundingBoxPainter extends CustomPainter {
               Offset(
                   size.width - points[2].dy / originalSize.height * size.width,
                   points[2].dx / originalSize.width * size.height),
-              linePaint);
+              paint);
           canvas.drawLine(
               Offset(
                   size.width - points[2].dy / originalSize.height * size.width,
@@ -66,7 +90,7 @@ class BoundingBoxPainter extends CustomPainter {
               Offset(
                   size.width - points[3].dy / originalSize.height * size.width,
                   points[3].dx / originalSize.width * size.height),
-              linePaint);
+              paint);
           canvas.drawLine(
               Offset(
                   size.width - points[3].dy / originalSize.height * size.width,
@@ -74,7 +98,7 @@ class BoundingBoxPainter extends CustomPainter {
               Offset(
                   size.width - points[0].dy / originalSize.height * size.width,
                   points[0].dx / originalSize.width * size.height),
-              linePaint);
+              paint);*/
         }
       }
     }

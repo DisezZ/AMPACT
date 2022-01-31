@@ -68,6 +68,11 @@ class LandmarkPainter extends CustomPainter {
           3,
           pointPaint);
     }
+    canvas.drawCircle(
+        Offset(points[8].dx.toDouble() * size.width,
+            points[8].dy.toDouble() * size.height),
+        3,
+        pointPaint..color = Colors.orange);
   }
 
   @override
