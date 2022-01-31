@@ -6,7 +6,9 @@ import 'package:ampact/src/core/tflite/tflite_model.dart';
 import 'package:ampact/src/utils/isolate_utils.dart';
 import 'package:camera/camera.dart';
 
-enum Models { handLanmark }
+enum Models {
+  handLanmark,
+}
 
 class ModelInferenceService {
   late TFLiteModel model;
@@ -35,6 +37,7 @@ class ModelInferenceService {
       case Models.handLanmark:
         model = locator<HandLandmark>();
         handler = runHandDetector;
+        break;
     }
   }
 }

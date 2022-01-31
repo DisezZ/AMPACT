@@ -5,15 +5,20 @@ import 'package:ampact/src/core/tflite/stats.dart';
 import 'package:ampact/src/utils/isolate_utils.dart';
 import 'package:ampact/src/utils/utils.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 
 class CameraView extends StatefulWidget {
-  final Function(Landmark? results)? resultsCallback;
+  final Function(Landmark? results)? handLandmarkResultsCallback;
+  final Function(Map<String, dynamic> results)?
+      handleRecognisedTextResultsCallback;
   final Function(Stats stats)? statsCallback;
 
   const CameraView({
     Key? key,
-    this.resultsCallback,
+    this.handLandmarkResultsCallback,
+    this.handleRecognisedTextResultsCallback,
     this.statsCallback,
   }) : super(key: key);
 
@@ -25,6 +30,7 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
   CameraController? _cameraController;
   late List<CameraDescription> _cameras;
   late CameraDescription _cameraDescription;
+  final TextDetector _textDetector = GoogleMlKit.vision.textDetector();
 
   late bool _detecting;
 
@@ -50,7 +56,7 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
     _cameras = await availableCameras();
     _cameraDescription = _cameras[0];
     _cameraController = CameraController(
-        _cameraDescription, ResolutionPreset.max,
+        _cameraDescription, ResolutionPreset.high,
         enableAudio: false);
     _cameraController!.addListener(() {
       if (mounted) setState(() {});
@@ -90,7 +96,6 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
   }
 
   Future<void> _inference({required CameraImage cameraImage}) async {
-    _modelInferenceService.setModelConfig(0);
     if (_modelInferenceService.model.interpreter != null && !_detecting) {
       setState(() {
         _detecting = true;
@@ -102,14 +107,65 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
       );
       final inferenceResults = _modelInferenceService.inferenceResults;
       if (inferenceResults != null) {
-        widget.resultsCallback!(inferenceResults['landmark']);
+        widget.handLandmarkResultsCallback!(inferenceResults['landmark']);
       } else {
-        widget.resultsCallback!(null);
+        widget.handLandmarkResultsCallback!(null);
       }
+
+      final InputImage inputImage = convertCameraImageToInputImage(cameraImage);
+      final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
+      widget.handleRecognisedTextResultsCallback!({
+        'originalSize':
+            Size(cameraImage.width.toDouble(), cameraImage.height.toDouble()),
+        'recognisedText': recognisedText,
+      });
+
       setState(() {
         _detecting = false;
       });
     }
+  }
+
+  InputImage convertCameraImageToInputImage(CameraImage cameraImage) {
+    final WriteBuffer allBytes = WriteBuffer();
+    for (Plane plane in cameraImage.planes) {
+      allBytes.putUint8List(plane.bytes);
+    }
+    final bytes = allBytes.done().buffer.asUint8List();
+
+    final Size imageSize =
+        Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+
+    final InputImageRotation imageRotation =
+        InputImageRotationMethods.fromRawValue(
+                _cameraDescription.sensorOrientation) ??
+            InputImageRotation.Rotation_0deg;
+
+    final InputImageFormat inputImageFormat =
+        InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ??
+            InputImageFormat.NV21;
+
+    final planeData = cameraImage.planes.map(
+      (Plane plane) {
+        return InputImagePlaneMetadata(
+          bytesPerRow: plane.bytesPerRow,
+          height: plane.height,
+          width: plane.width,
+        );
+      },
+    ).toList();
+
+    final inputImageData = InputImageData(
+      size: imageSize,
+      imageRotation: imageRotation,
+      inputImageFormat: inputImageFormat,
+      planeData: planeData,
+    );
+
+    final inputImage =
+        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+
+    return inputImage;
   }
 
   @override

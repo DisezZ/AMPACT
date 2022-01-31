@@ -7,7 +7,7 @@ final locator = GetIt.instance;
 void setupLocator() {
   locator.registerSingleton<HandLandmark>(HandLandmark());
   //locator.registerSingleton<FaceMesh>(FaceMesh());
-  //locator.registerSingleton<Hands>(Hands());
+  //locator.registerSingleton<TextRecognition>(TextRecognition());
   //locator.registerSingleton<Pose>(Pose());
 
   locator.registerLazySingleton<ModelInferenceService>(

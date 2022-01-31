@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -72,6 +74,45 @@ class ImageUtils {
         (r & 0xff);
   }
 
+  static InputImage convertCameraImageToInputImageData(
+      CameraImage cameraImage) {
+    final WriteBuffer allBytes = WriteBuffer();
+    for (Plane plane in cameraImage.planes) {
+      allBytes.putUint8List(plane.bytes);
+    }
+    final bytes = allBytes.done().buffer.asUint8List();
+
+    final Size imageSize =
+        Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+
+    const InputImageRotation imageRotation = InputImageRotation.Rotation_0deg;
+
+    final InputImageFormat inputImageFormat =
+        InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ??
+            InputImageFormat.NV21;
+
+    final planeData = cameraImage.planes.map(
+      (Plane plane) {
+        return InputImagePlaneMetadata(
+          bytesPerRow: plane.bytesPerRow,
+          height: plane.height,
+          width: plane.width,
+        );
+      },
+    ).toList();
+
+    final inputImageData = InputImageData(
+      size: imageSize,
+      imageRotation: imageRotation,
+      inputImageFormat: inputImageFormat,
+      planeData: planeData,
+    );
+
+    final inputImage =
+        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+    return inputImage;
+  }
+
   static void saveImage(imglib.Image image, [int i = 0]) async {
     List<int> jpeg = imglib.JpegEncoder().encodeImage(image);
     final appDir = await getExternalStorageDirectory();
@@ -92,10 +133,9 @@ class ImageUtils {
   }
 
   Future<Image> tinypng(Uint8List uint8list) async {
-
-  // copy from decodeImageFromList of package:flutter/painting.dart
-  final codec = await instantiateImageCodec(uint8list);
-  final frameInfo = await codec.getNextFrame();
-  return frameInfo.image;
-}
+    // copy from decodeImageFromList of package:flutter/painting.dart
+    final codec = await instantiateImageCodec(uint8list);
+    final frameInfo = await codec.getNextFrame();
+    return frameInfo.image;
+  }
 }

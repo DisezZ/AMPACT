@@ -11,6 +11,7 @@ mixin ModelFile {
   static const String directory = 'model/';
   static const String handLandmark = directory + 'hand_landmark_full.tflite';
   static const String textDetector = directory + 'text_detector_fp16.tflite';
+  static const String textRecognition = directory + 'keras_ocr_fp16.tflite';
 }
 
 mixin ImageFile {
